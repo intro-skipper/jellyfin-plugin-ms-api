@@ -4,7 +4,7 @@ guid: "6f0aaab5-e251-4a6d-b8d5-bc8c65222051"
 version: "1.0.0.0"
 targetAbi: "10.10.0.0"
 framework: "net8.0"
-overview: "Create and delete MediaSegments API"
+overview: "Create and delete Media Segments"
 description: >
   Provide an extended HTTP API to create and delete MediaSegments
 category: "General"
