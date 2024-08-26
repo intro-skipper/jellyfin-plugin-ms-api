@@ -8,8 +8,8 @@ overview: "Create and delete Media Segments"
 description: >
   Provide an extended HTTP API to create and delete MediaSegments
 category: "General"
-owner: "jellyfin"
+owner: "Endrl"
 artifacts:
-- "Jellyfin.Plugin.MediaSegmentsAPI.dll"
+- "Jellyfin.Plugin.MediaSegmentsApi.dll"
 changelog: >
   changelog
