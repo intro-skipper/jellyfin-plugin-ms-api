@@ -11,18 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!--
     <PackageReference Include="Jellyfin.Controller" Version="10.10.*" />
     <PackageReference Include="Jellyfin.Model" Version="10.10.*" />
-  -->
-  </ItemGroup>
-  <!-- REMOVE AND USE NUGET PUBLISHED PACKAGES -->
-  <ItemGroup>
-    <ProjectReference Include="../../jellyfin/Jellyfin.Data/Jellyfin.Data.csproj" />
-    <ProjectReference Include="../../jellyfin/MediaBrowser.Model/MediaBrowser.Model.csproj" />
-    <ProjectReference Include="../../jellyfin/MediaBrowser.Controller/MediaBrowser.Controller.csproj" />
-    <ProjectReference Include="../../jellyfin/MediaBrowser.Common/MediaBrowser.Common.csproj" />
-    <ProjectReference Include="../../jellyfin/src/Jellyfin.Extensions/Jellyfin.Extensions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

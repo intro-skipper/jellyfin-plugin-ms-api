@@ -1,7 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using MediaBrowser.Common.Extensions;
 using MediaBrowser.Controller;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
@@ -76,7 +78,9 @@ public class MediaSegmentsApiController : ControllerBase
 
         segment.ItemId = item.Id;
 
-        var seg = await _mediaSegmentManager.CreateSegmentAsync(segment, providerId).ConfigureAwait(false);
+        var providerUID = providerId.ToLowerInvariant().GetMD5().ToString("N", CultureInfo.InvariantCulture);
+
+        var seg = await _mediaSegmentManager.CreateSegmentAsync(segment, providerUID).ConfigureAwait(false);
         return Ok(seg);
     }
 
