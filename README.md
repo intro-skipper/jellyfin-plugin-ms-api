@@ -4,11 +4,14 @@ Extends the Jellyfin MediaSegments HTTP API with create and delete endpoints.
 
 ## Requirements
 
-- ⚠️ Jellyfin 10.10 unstable
+- ⚠️ Jellyfin 10.10
 
 ## Installation instructions
 
-1. Add plugin repository to your server: `https://raw.githubusercontent.com/endrl/jellyfin-plugin-repo/master/manifest.json`
+1. Add plugin repository to your server:
+```
+https://manifest.intro-skipper.org/manifest.json
+```
 2. Install the "MediaSegments API" plugin from the General section
 3. Restart Jellyfin
 
