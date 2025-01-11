@@ -18,26 +18,20 @@ namespace Jellyfin.Plugin.MediaSegmentsApi.Controllers;
 /// <summary>
 /// Extended API for MediaSegments Management.
 /// </summary>
+/// <remarks>
+/// Initializes a new instance of the <see cref="MediaSegmentsApiController"/> class.
+/// </remarks>
+/// <param name="mediaSegmentManager">MediaSegmentManager.</param>
+/// <param name="libraryManager">The Library manager.</param>
 [Authorize(Policy = "RequiresElevation")]
 [ApiController]
 [Produces(MediaTypeNames.Application.Json)]
 [Route("MediaSegmentsApi")]
-public class MediaSegmentsApiController : ControllerBase
+public class MediaSegmentsApiController(IMediaSegmentManager mediaSegmentManager, ILibraryManager libraryManager) : ControllerBase
 {
-    private readonly IMediaSegmentManager _mediaSegmentManager;
+    private readonly IMediaSegmentManager _mediaSegmentManager = mediaSegmentManager;
 
-    private readonly ILibraryManager _libraryManager;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MediaSegmentsApiController"/> class.
-    /// </summary>
-    /// <param name="mediaSegmentManager">MediaSegmentManager.</param>
-    /// <param name="libraryManager">The Library manager.</param>
-    public MediaSegmentsApiController(IMediaSegmentManager mediaSegmentManager, ILibraryManager libraryManager)
-    {
-        _mediaSegmentManager = mediaSegmentManager;
-        _libraryManager = libraryManager;
-    }
+    private readonly ILibraryManager _libraryManager = libraryManager;
 
     /// <summary>
     /// Plugin meta endpoint.
@@ -71,7 +65,7 @@ public class MediaSegmentsApiController : ControllerBase
         [FromBody, Required] MediaSegmentDto segment)
     {
         var item = _libraryManager.GetItemById<BaseItem>(itemId);
-        if (item is null)
+        if (item is null || segment is null || providerId is null)
         {
             return NotFound();
         }
