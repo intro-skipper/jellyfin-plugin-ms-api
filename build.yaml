@@ -1,14 +1,14 @@
 ---
 name: "MediaSegments API"
 guid: "6f0aaab5-e251-4a6d-b8d5-bc8c65222051"
-version: "1.0.0.0"
+version: "1.0.2.0"
 targetAbi: "10.10.2.0"
 framework: "net8.0"
 overview: "Create and delete Media Segments"
 description: >
   Provide an extended HTTP API to create and delete MediaSegments
 category: "General"
-owner: "Endrl"
+owner: "intro-skipper"
 artifacts:
 - "Jellyfin.Plugin.MediaSegmentsApi.dll"
 changelog: >
