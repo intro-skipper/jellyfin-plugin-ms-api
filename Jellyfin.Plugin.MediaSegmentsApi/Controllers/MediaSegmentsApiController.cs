@@ -33,10 +33,6 @@ public class MediaSegmentsApiController(IMediaSegmentManager mediaSegmentManager
 
     private readonly ILibraryManager _libraryManager = libraryManager;
 
-    private readonly string _pluginId = Plugin.Instance!.Name.ToLowerInvariant()
-                                        .GetMD5()
-                                        .ToString("N", CultureInfo.InvariantCulture);
-
     /// <summary>
     /// Plugin meta endpoint.
     /// </summary>
@@ -69,14 +65,16 @@ public class MediaSegmentsApiController(IMediaSegmentManager mediaSegmentManager
         [FromBody, Required] MediaSegmentDto segment)
     {
         var item = _libraryManager.GetItemById<BaseItem>(itemId);
-        if (item is null || segment is null)
+        if (item is null || segment is null || providerId is null)
         {
             return NotFound();
         }
 
         segment.ItemId = item.Id;
 
-        var seg = await _mediaSegmentManager.CreateSegmentAsync(segment, _pluginId).ConfigureAwait(false);
+        var providerUID = providerId.ToLowerInvariant().GetMD5().ToString("N", CultureInfo.InvariantCulture);
+
+        var seg = await _mediaSegmentManager.CreateSegmentAsync(segment, providerUID).ConfigureAwait(false);
         return Ok(seg);
     }
 
