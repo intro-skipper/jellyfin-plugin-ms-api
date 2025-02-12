@@ -1,17 +1,21 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using MediaBrowser.Common.Extensions;
 using MediaBrowser.Controller;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
+using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.MediaSegments;
 using MediaBrowser.Model.Querying;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.MediaSegmentsApi.Controllers;
 
@@ -23,20 +27,26 @@ namespace Jellyfin.Plugin.MediaSegmentsApi.Controllers;
 /// </remarks>
 /// <param name="mediaSegmentManager">MediaSegmentManager.</param>
 /// <param name="libraryManager">The Library manager.</param>
+/// <param name="segmentProviders">The Segment providers.</param>
+/// <param name="logger">The logger.</param>
 [Authorize(Policy = "RequiresElevation")]
 [ApiController]
 [Produces(MediaTypeNames.Application.Json)]
 [Route("MediaSegmentsApi")]
-public class MediaSegmentsApiController(IMediaSegmentManager mediaSegmentManager, ILibraryManager libraryManager) : ControllerBase
+public class MediaSegmentsApiController(IMediaSegmentManager mediaSegmentManager, ILibraryManager libraryManager, IEnumerable<IMediaSegmentProvider> segmentProviders, ILogger<MediaSegmentsApiController> logger) : ControllerBase
 {
     private readonly IMediaSegmentManager _mediaSegmentManager = mediaSegmentManager;
 
     private readonly ILibraryManager _libraryManager = libraryManager;
 
+    private readonly IEnumerable<IMediaSegmentProvider> _segmentProviders = [.. segmentProviders.OrderBy(i => i is IHasOrder hasOrder ? hasOrder.Order : 0)];
+
+    private readonly ILogger<MediaSegmentsApiController> _logger = logger;
+
     /// <summary>
-    /// Plugin meta endpoint.
+    /// Plugin metadata endpoint.
     /// </summary>
-    /// <returns>The created segment.</returns>
+    /// <returns>The plugin metadata.</returns>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public JsonResult GetPluginMetadata()
@@ -45,6 +55,8 @@ public class MediaSegmentsApiController(IMediaSegmentManager mediaSegmentManager
         {
             version = Plugin.Instance!.Version.ToString(3),
         };
+
+        _logger.LogInformation("Plugin metadata: {Json}", json);
 
         return new JsonResult(json);
     }
@@ -67,14 +79,40 @@ public class MediaSegmentsApiController(IMediaSegmentManager mediaSegmentManager
         var item = _libraryManager.GetItemById<BaseItem>(itemId);
         if (item is null || segment is null || providerId is null)
         {
-            return NotFound();
+            return NotFound(); // Item, segment, or providerId missing
         }
 
-        segment.ItemId = item.Id;
+        var libraryOptions = _libraryManager.GetLibraryOptions(item);
 
-        var providerUID = providerId.ToLowerInvariant().GetMD5().ToString("N", CultureInfo.InvariantCulture);
+        // Calculate provider UID from query parameter
+        var providerUID = GetProviderId(providerId);
 
-        var seg = await _mediaSegmentManager.CreateSegmentAsync(segment, providerUID).ConfigureAwait(false);
+        // Get the list of active provider UIDs, i.e. those not disabled in the library options.
+        var activeProviderIds = _segmentProviders
+            .Where(e => !libraryOptions.DisabledMediaSegmentProviders.Contains(GetProviderId(e.Name)))
+            .Select(e => GetProviderId(e.Name))
+            .ToList();
+
+        // Check for the specific provider
+        if (!activeProviderIds.Contains(providerUID))
+        {
+            // Return a 404 response with a custom message for provider not found.
+            _logger.LogError("Provider with id '{ProviderId}' not found.", providerId);
+            return NotFound(new { Message = $"Provider with id '{providerId}' not found." });
+        }
+
+        // Assign the item id to the segment
+        var mediaSegment = new MediaSegmentDto
+        {
+            ItemId = item.Id,
+            StartTicks = segment.StartTicks,
+            EndTicks = segment.EndTicks
+        };
+
+        _logger.LogInformation("Creating segment for item {ItemId} with provider {ProviderId}", item.Id, providerId);
+
+        // Create the segment using the provider UID
+        var seg = await _mediaSegmentManager.CreateSegmentAsync(mediaSegment, providerUID).ConfigureAwait(false);
         return Ok(seg);
     }
 
@@ -88,7 +126,13 @@ public class MediaSegmentsApiController(IMediaSegmentManager mediaSegmentManager
     public async Task DeleteSegmentAsync(
         [FromRoute, Required] Guid segmentId)
     {
+        _logger.LogInformation("Deleting segment with id {SegmentId}", segmentId);
         await _mediaSegmentManager.DeleteSegmentAsync(segmentId).ConfigureAwait(false);
         Ok();
     }
+
+    private static string GetProviderId(string name)
+        => name.ToLowerInvariant()
+            .GetMD5()
+            .ToString("N", CultureInfo.InvariantCulture);
 }
