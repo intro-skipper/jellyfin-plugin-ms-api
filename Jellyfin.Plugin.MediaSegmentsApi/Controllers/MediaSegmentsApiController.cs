@@ -98,7 +98,7 @@ public class MediaSegmentsApiController(IMediaSegmentManager mediaSegmentManager
         {
             // Return a 404 response with a custom message for provider not found.
             _logger.LogError("Provider with id '{ProviderId}' not found.", providerId);
-            return NotFound(new { Message = $"Provider with id '{providerId}' not found." });
+            return NotFound(new { message = $"Provider with id '{providerId}' not found." });
         }
 
         // Assign the item id to the segment
