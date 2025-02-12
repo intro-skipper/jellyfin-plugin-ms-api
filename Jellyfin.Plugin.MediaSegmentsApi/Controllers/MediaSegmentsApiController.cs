@@ -56,8 +56,6 @@ public class MediaSegmentsApiController(IMediaSegmentManager mediaSegmentManager
             version = Plugin.Instance!.Version.ToString(3),
         };
 
-        _logger.LogInformation("Plugin metadata: {Json}", json);
-
         return new JsonResult(json);
     }
 
@@ -106,7 +104,8 @@ public class MediaSegmentsApiController(IMediaSegmentManager mediaSegmentManager
         {
             ItemId = item.Id,
             StartTicks = segment.StartTicks,
-            EndTicks = segment.EndTicks
+            EndTicks = segment.EndTicks,
+            Type = segment.Type
         };
 
         _logger.LogInformation("Creating segment for item {ItemId} with provider {ProviderId}", item.Id, providerId);
