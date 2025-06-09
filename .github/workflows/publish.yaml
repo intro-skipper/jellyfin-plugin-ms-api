@@ -55,7 +55,7 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Create archive
-        run: zip -j "Jellyfin.Plugin.MediaSegmentsApi-${{ env.NEW_FILE_VERSION }}.zip" Jellyfin.Plugin.MediaSegmentsApi/bin/Release/net8.0/Jellyfin.Plugin.MediaSegmentsApi.dll
+        run: zip -j "Jellyfin.Plugin.MediaSegmentsApi-${{ env.NEW_FILE_VERSION }}.zip" Jellyfin.Plugin.MediaSegmentsApi/bin/Release/net9.0/Jellyfin.Plugin.MediaSegmentsApi.dll
 
       - name: Create new release with tag
         if: github.event_name != 'pull_request'
