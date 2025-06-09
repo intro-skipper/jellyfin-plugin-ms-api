@@ -1,5 +1,6 @@
 using Jellyfin.Plugin.MediaSegmentsApi.Providers;
 using MediaBrowser.Controller;
+using MediaBrowser.Controller.MediaSegments;
 using MediaBrowser.Controller.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 

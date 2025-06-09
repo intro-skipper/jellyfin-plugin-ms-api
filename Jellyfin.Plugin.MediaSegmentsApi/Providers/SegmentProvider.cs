@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using MediaBrowser.Controller;
 using MediaBrowser.Controller.Entities;
+using MediaBrowser.Controller.MediaSegments;
 using MediaBrowser.Model;
 using MediaBrowser.Model.MediaSegments;
 
