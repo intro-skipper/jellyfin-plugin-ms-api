@@ -1,5 +1,8 @@
 # Jellyfin Plugin MediaSegments API
 
+> [!NOTE]  
+> This plugin is now obsolete as the functionality is included in the 10.11 Jellyfin release of the Intro Skipper plugin!
+
 Extends the Jellyfin MediaSegments HTTP API with create and delete endpoints.
 
 ## Requirements
